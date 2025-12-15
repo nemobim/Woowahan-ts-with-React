@@ -490,7 +490,7 @@ function UserProfile({ userId }: { userId: number }) {
 // 1. deps 없음: 매 렌더링마다 실행
 useEffect(() => {
   console.log('매 렌더링마다 실행');
-});ㄴ
+});
 
 // 2. 빈 배열: 마운트 시 한 번만 실행
 useEffect(() => {
@@ -547,10 +547,9 @@ useEffect(() => {
 
 ### 4.5 정리 함수 (Cleanup Function)
 
-1. 정리 함정리 함수는 다음 시점에 실행됩니다:
-2. 컴포넌트 언마운트 시
-
-다음 effect 실행 전
+정리 함정리 함수는 다음 시점에 실행됩니다:
+1. 컴포넌트 언마운트 시
+2. 다음 effect 실행 전
 
 ```typescript
 function Timer() {
