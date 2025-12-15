@@ -4,17 +4,18 @@
 
 ### 1.1 클래스 컴포넌트의 문제점
 
-React v16.8 이전에는 클래스 컴포넌트를 사용해야 했고, 이는 몇 가지 불편함을 동반했습니다:
+React v16.8 이전에는 클래스 컴포넌트를 사용해야 했고, 다음과 같은 문제가 있었습니다.
 
 **1. 컴포넌트 간 상태 로직 재사용의 어려움**
-- HOC(Higher Order Component)나 Render Props 패턴이 필요했고, 이는 코드를 복잡하게 만들었습니다.
+- 상태 로직을 공유하려면 HOC(Higher Order Component)나 Render Props 패턴이 필요했습니다
+- 코드 구조가 복잡해졌습니다.
 
 **2. 복잡한 생명주기 메서드**
-- `componentDidMount`, `componentDidUpdate` 등에 서로 관련 없는 로직들이 섞여 있었습니다.
-- 관심사의 분리가 어려웠습니다.
+- `componentDidMount`, `componentDidUpdate` 등에 여러 기능이 섞여 있었습니다.
+- 관심사를 분리하기 어려웠습니다.
 
 **3. this 바인딩 문제**
-- 클래스 메서드에서 `this`를 사용할 때 바인딩이 필요했습니다.
+- 클래스 메서드에서 this를 직접 바인딩해야 했습니다.
 - 코드 가독성이 떨어졌습니다.
 
 **4. 테스트와 디버깅의 어려움**
@@ -64,7 +65,7 @@ class Counter extends React.Component {
 ```
 
 ### 1.2 함수 컴포넌트 + Hooks의 장점
-
+React Hooks를 사용하면 아래와 같은 이점이 있습니다.
 ```typescript
 // 함수 컴포넌트 + Hooks
 import { useState, useEffect } from 'react';
@@ -91,10 +92,10 @@ function Counter() {
 
 **Hooks의 이점:**
 1. 간결하고 직관적인 코드
-2. 로직의 재사용성 향상 (커스텀 훅)
-3. 관심사별로 코드 분리 가능
+2. 커스텀 훅을 통해 로직 재사용 가능
+3. 관심사별 코드 분리 용이
 4. this 바인딩 불필요
-5. 테스트 용이성 증가
+5. 테스트하기 쉬움
 
 **비교표**
 
@@ -115,11 +116,11 @@ function Counter() {
 
 React Hooks를 안전하게 사용하기 위해서는 **반드시** 다음 두 가지 규칙을 지켜야 합니다.
 
-### 2.1 규칙 1: 최상위에서만 Hook 호출하기
+### 2.1 최상위에서만 호출하기
 
 **Hook은 항상 컴포넌트의 최상위 레벨에서 호출되어야 합니다.**
 
-- 조건문, 반복문, 중첩 함수 내부에서 Hook을 호출하면 안 됩니다.
+- useState, useEffect 등은 조건문, 반복문, 중첩 함수 내부에서 호출하면 안 됩니다.
 - 조기 반환(early return) 이후에 Hook을 호출하면 안 됩니다.
 
 ```typescript
@@ -183,7 +184,7 @@ function Component({ condition }: { condition: boolean }) {
 }
 ```
 
-### 2.2 규칙 2: React 함수 내에서만 Hook 호출하기
+### 2.2 함수 컴포넌트나 커스텀 Hook 안에서만 호출하기
 
 **Hook은 다음 두 곳에서만 호출해야 합니다:**
 
@@ -238,7 +239,7 @@ npm install eslint-plugin-react-hooks --save-dev
 
 ## 3. useState
 
-`useState`는 함수 컴포넌트에서 상태를 관리하기 위한 가장 기본적인 Hook입니다.
+useState는 함수 컴포넌트에서 **상태(state)**를 관리할 때 사용하는 가장 기본적인 Hook입니다.
 
 ### 3.1 useState 타입 정의
 
@@ -254,8 +255,8 @@ type SetStateAction<S> = S | ((prevState: S) => S);
 **타입 분석:**
 - **S**: 상태의 타입
 - **initialState**: 초기 상태 값 또는 초기 상태를 반환하는 함수
-- **반환값**: `[현재 상태, 상태 업데이트 함수]` 튜플
-- **SetStateAction**: 새로운 상태 값 또는 이전 상태를 받아 새 상태를 반환하는 함수
+- **반환값**: `[현재 상태, 상태 업데이트 함수]` 튜플 형태의 배열
+- **SetStateAction**: 상태 변경 함수는 직접 값 또는 이전 상태를 기반으로 한 함수 둘 다 받을 수 있음
 
 ### 3.2 기본 사용법
 
@@ -275,6 +276,8 @@ function Counter() {
   );
 }
 ```
+- useState는 배열을 반환하며, 첫 번째 값이 상태, 두 번째가 상태를 변경하는 함수입니다.
+- 함수형 업데이트 방식(prev => prev + 1)은 이전 상태에 의존할 때 사용합니다.
 
 ### 3.3 타입스크립트와 함께 사용하기
 
@@ -378,7 +381,7 @@ function MemberList() {
 
 ### 3.4 초기 상태 최적화
 
-초기 상태가 복잡한 계산을 필요로 할 때는 함수를 전달하여 최적화할 수 있습니다.
+초기 상태 계산이 무거울 경우, useState에 함수를 전달하면 렌더링 시마다 계산되지 않습니다.
 
 ```typescript
 // ❌ 매 렌더링마다 계산 실행
@@ -403,7 +406,7 @@ function TodoList() {
 
 ### 3.5 함수형 업데이트
 
-이전 상태를 기반으로 새 상태를 계산할 때는 함수형 업데이트를 사용하세요.
+동일한 상태 변경 함수를 여러 번 호출할 때는 함수형 업데이트를 사용하세요.
 
 ```typescript
 function Counter() {
@@ -413,14 +416,14 @@ function Counter() {
   const incrementTwice = () => {
     setCount(count + 1);
     setCount(count + 1); // count는 여전히 이전 값
-    // 결과: 1만 증가
+   // → 실제로는 한 번만 증가
   };
 
   // ✅ 함수형 업데이트로 해결
   const incrementTwiceCorrect = () => {
     setCount(prev => prev + 1);
     setCount(prev => prev + 1);
-    // 결과: 2 증가
+    //  → 실제로 두 번 증가
   };
 
   return (
@@ -437,7 +440,8 @@ function Counter() {
 
 ## 4. useEffect
 
-`useEffect`는 컴포넌트가 렌더링된 후 부수 효과(side effect)를 수행하기 위한 Hook입니다.
+useEffect는 **렌더링 이후 수행할 작업(부수 효과, side effect)**을 처리하는 Hook입니다.
+예: 데이터 요청, 이벤트 등록, 타이머 설정 등
 
 ### 4.1 useEffect 타입 정의
 
@@ -452,7 +456,7 @@ type Destructor = () => void;
 **타입 분석:**
 - **effect**: 부수 효과를 수행하는 콜백 함수
 - **deps**: 선택적 의존성 배열
-- **Destructor**: 정리(cleanup) 함수
+- **Destructor**: 콜백은 void 또는 정리 함수(cleanup)를 반환해야 하며, Promise를 반환하면 안 됩니다.
 
 **중요**: `EffectCallback`은 `void` 또는 `Destructor`만 반환할 수 있으며, **Promise는 반환할 수 없습니다**.
 
@@ -486,7 +490,7 @@ function UserProfile({ userId }: { userId: number }) {
 // 1. deps 없음: 매 렌더링마다 실행
 useEffect(() => {
   console.log('매 렌더링마다 실행');
-});
+});ㄴ
 
 // 2. 빈 배열: 마운트 시 한 번만 실행
 useEffect(() => {
@@ -529,8 +533,7 @@ useEffect(() => {
   fetchData();
 }, []);
 
-// ✅ 올바른 예시 2: IIFE 사용
-useEffect(() => {
+// ✅ 올바른 예시 2: IIFE즉시 실행 함수(IIFE)useEffect(() => {
   (async () => {
     const data = await fetchData();
     setData(data);
@@ -540,13 +543,14 @@ useEffect(() => {
 
 **왜 직접 async를 사용할 수 없나?**
 
-`async` 함수는 항상 Promise를 반환합니다. 하지만 `useEffect`는 `void` 또는 정리 함수만 반환해야 합니다. Promise를 반환하면 React가 정리 함수로 인식하려고 시도하여 문제가 발생합니다.
+`asy`async` 함수는 항상 Promise를 반환합니다. 하지만 `useEffect`는 `void` 또는 정리 함수만 반환해야 합니다. Promise를 반환하면 React가 정리 함수로 인식하려고 시도하여 문제가 발생합니다
 
 ### 4.5 정리 함수 (Cleanup Function)
 
-정리 함수는 다음 상황에서 실행됩니다:
-1. 컴포넌트가 언마운트될 때
-2. 다음 effect가 실행되기 전
+1. 정리 함정리 함수는 다음 시점에 실행됩니다:
+2. 컴포넌트 언마운트 시
+
+다음 effect 실행 전
 
 ```typescript
 function Timer() {
